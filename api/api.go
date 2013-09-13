@@ -16,3 +16,9 @@ type Service interface {
 	Set(*SetArgs, *SetResult) error
 	Get(*GetArgs, *GetResult) error
 }
+
+type Store interface {
+	New(string) (string, error)
+	Set(string, string) error
+	Get(string) (string, error)
+}

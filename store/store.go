@@ -1,5 +1,5 @@
 // Package urls creates and stores URLs in a Redis database.
-package urls
+package store
 
 import (
 	"errors"
