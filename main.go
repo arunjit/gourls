@@ -6,7 +6,11 @@ import (
 	"net/http"
 	"net/rpc"
 
+	grpc "github.com/gorilla/rpc/v2"
+	jsrpc "github.com/gorilla/rpc/v2/json2"
+
 	//"github.com/arunjit/gohttpx/httpx"
+	"github.com/arunjit/gourls/api"
 	"github.com/arunjit/gourls/service"
 	"github.com/arunjit/gourls/store"
 )
@@ -20,25 +24,38 @@ var (
 )
 
 const (
-	serviceName = "URL"
-	rpcPath     = "/rpc"
-	debugPath   = "/_/debug/rpc"
+	serviceName  = "URL"
+	rpcPath      = "/rpc"
+	rpcDebugPath = "/_/debug/rpc"
+	jsonPath     = "/json"
 )
+
+func newStore() api.Store {
+	return store.NewURLStore(*redisFlag)
+}
+
+func newService() api.Service {
+	return service.NewRPCService(newStore())
+}
 
 func createRPC() {
 	// The RPC service
-	rpcSvc := service.NewRPCService(store.NewURLStore(*redisFlag))
+	svc := newService()
 
 	svr := rpc.NewServer()
-	svr.RegisterName(serviceName, rpcSvc)
-	svr.HandleHTTP(rpcPath, debugPath)
-
-	rpc.Register(rpcSvc)
-	rpc.HandleHTTP()
+	svr.RegisterName(serviceName, svc)
+	svr.HandleHTTP(rpcPath, rpcDebugPath)
+	svr.Register(svc)
+	svr.HandleHTTP()
 }
 
 func createJSON() {
-	log.Fatalln("Coming soon.")
+	svc := service.NewJSONService(newService())
+
+	svr := grpc.NewServer()
+	svr.RegisterCodec(jsrpc.NewCodec(), "application/json")
+	svr.RegisterService(svc, serviceName)
+	http.Handle(jsonPath, svr)
 }
 
 func main() {
