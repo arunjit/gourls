@@ -12,29 +12,29 @@ func NewRPCService(s api.Store) *RPCService {
 	return &RPCService{s}
 }
 
-func (s *RPCService) New(args *api.NewArgs, result *api.NewResult) error {
+func (s *RPCService) New(args *api.NewArgs, reply *api.NewReply) error {
 	key, err := s.store.New(string(*args))
 	if err != nil {
 		return err
 	}
-	*result = api.NewResult(key)
+	*reply = api.NewReply(key)
 	return nil
 }
 
-func (s *RPCService) Set(args *api.SetArgs, result *api.SetResult) error {
+func (s *RPCService) Set(args *api.SetArgs, reply *api.SetReply) error {
 	if err := s.store.Set(args.Key, args.URL); err != nil {
-		*result = api.SetResult(false)
+		*reply = api.SetReply(false)
 		return err
 	}
-	*result = api.SetResult(true)
+	*reply = api.SetReply(true)
 	return nil
 }
 
-func (s *RPCService) Get(args *api.GetArgs, result *api.GetResult) error {
+func (s *RPCService) Get(args *api.GetArgs, reply *api.GetReply) error {
 	url, err := s.store.Get(string(*args))
 	if err != nil {
 		return err
 	}
-	*result = api.GetResult(url)
+	*reply = api.GetReply(url)
 	return nil
 }

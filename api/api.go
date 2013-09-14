@@ -1,20 +1,20 @@
 package api
 
-type NewArgs string   // key
-type NewResult string // URL
+type NewArgs string  // key
+type NewReply string // URL
 
 type SetArgs struct {
 	Key, URL string
 }
-type SetResult bool
+type SetReply bool
 
-type GetArgs string   // key
-type GetResult string // URL
+type GetArgs string  // key
+type GetReply string // URL
 
 type Service interface {
-	New(*NewArgs, *NewResult) error
-	Set(*SetArgs, *SetResult) error
-	Get(*GetArgs, *GetResult) error
+	New(*NewArgs, *NewReply) error
+	Set(*SetArgs, *SetReply) error
+	Get(*GetArgs, *GetReply) error
 }
 
 type Store interface {

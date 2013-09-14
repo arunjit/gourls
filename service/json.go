@@ -15,14 +15,14 @@ func NewJSONService(s api.Service) *JSONService {
 	return &JSONService{s}
 }
 
-func (s *JSONService) New(r *http.Request, args *api.NewArgs, result *api.NewResult) error {
-	return s.rpc.New(args, result)
+func (s *JSONService) New(r *http.Request, args *api.NewArgs, reply *api.NewReply) error {
+	return s.rpc.New(args, reply)
 }
 
-func (s *JSONService) Set(r *http.Request, args *api.SetArgs, result *api.SetResult) error {
-	return s.rpc.Set(args, result)
+func (s *JSONService) Set(r *http.Request, args *api.SetArgs, reply *api.SetReply) error {
+	return s.rpc.Set(args, reply)
 }
 
-func (s *JSONService) Get(r *http.Request, args *api.GetArgs, result *api.GetResult) error {
-	return s.rpc.Get(args, result)
+func (s *JSONService) Get(r *http.Request, args *api.GetArgs, reply *api.GetReply) error {
+	return s.rpc.Get(args, reply)
 }
