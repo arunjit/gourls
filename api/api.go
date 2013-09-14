@@ -1,15 +1,26 @@
 package api
 
-type NewArgs string  // key
-type NewReply string // URL
+type NewArgs struct {
+	URL string `json:"url"`
+}
+type NewReply struct {
+	Keys []string `json:"keys"`
+}
 
 type SetArgs struct {
-	Key, URL string
+	Key string `json:"key"`
+	URL string `json:"url"`
 }
-type SetReply bool
+type SetReply struct {
+	Keys []string `json:"keys"`
+}
 
-type GetArgs string  // key
-type GetReply string // URL
+type GetArgs struct {
+	Key string `json:"key"`
+}
+type GetReply struct {
+	URL string `json:"url"`
+}
 
 type Service interface {
 	New(*NewArgs, *NewReply) error
@@ -19,6 +30,6 @@ type Service interface {
 
 type Store interface {
 	New(string) (string, error)
-	Set(string, string) error
+	Set(string, string) (string, error)
 	Get(string) (string, error)
 }

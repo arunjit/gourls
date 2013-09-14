@@ -1,6 +1,8 @@
 package service
 
 import (
+	"strings"
+
 	"github.com/arunjit/gourls/api"
 )
 
@@ -13,28 +15,28 @@ func NewRPCService(s api.Store) *RPCService {
 }
 
 func (s *RPCService) New(args *api.NewArgs, reply *api.NewReply) error {
-	key, err := s.store.New(string(*args))
+	key, err := s.store.New(args.URL)
 	if err != nil {
 		return err
 	}
-	*reply = api.NewReply(key)
+	reply.Keys = strings.Split(key, ",")
 	return nil
 }
 
 func (s *RPCService) Set(args *api.SetArgs, reply *api.SetReply) error {
-	if err := s.store.Set(args.Key, args.URL); err != nil {
-		*reply = api.SetReply(false)
+	key, err := s.store.Set(args.Key, args.URL)
+	if err != nil {
 		return err
 	}
-	*reply = api.SetReply(true)
+	reply.Keys = strings.Split(key, ",")
 	return nil
 }
 
 func (s *RPCService) Get(args *api.GetArgs, reply *api.GetReply) error {
-	url, err := s.store.Get(string(*args))
+	url, err := s.store.Get(args.Key)
 	if err != nil {
 		return err
 	}
-	*reply = api.GetReply(url)
+	reply.URL = url
 	return nil
 }

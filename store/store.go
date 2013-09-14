@@ -67,26 +67,28 @@ func (s *URLStore) New(url string) (string, error) {
 }
 
 // Set stores a URL with the given key.
-func (s *URLStore) Set(key, url string) error {
+func (s *URLStore) Set(key, url string) (string, error) {
 	c := s.pool.Get()
 	defer c.Close()
 
 	// Check if key already exists
 	if exists, err := redis.Bool(c.Do("EXISTS", fullKey(key))); err != nil {
-		return err
+		return "", err
 	} else if exists {
-		return ErrConflict
+		return "", ErrConflict
 	}
 
 	// Key doesn't exist. Set it now.
 	c.Send("MULTI")
 	c.Send("SET", fullKey(key), url)
 	c.Send("LPUSH", fullKeyForUrl(url), key)
-	if _, err := c.Do("EXEC"); err != nil {
-		return err
+	c.Send("LRANGE", fullKeyForUrl(url), 0, -1)
+	values, err := redis.Values(c.Do("EXEC"))
+	if err != nil {
+		return "", err
 	}
-
-	return nil
+	keys, _ := redis.Strings(values[len(values)-1], nil)
+	return strings.Join(keys, ","), nil
 }
 
 // Get retrieves a URL for the given key.
