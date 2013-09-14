@@ -4,13 +4,14 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net/rpc"
 
-	"github.com/arunjit/gourls/store"
+	"github.com/arunjit/gourls/api"
 )
 
 // Flags
 var (
-	redisFlag = flag.String("redis", "localhost:6379", "Redis server")
+	serverFlag = flag.String("server", "127.0.0.1:2001", "The RPC server")
 )
 
 const (
@@ -59,27 +60,36 @@ func main() {
 	flag.Parse()
 	cmd := getCommand(flag.Args())
 
-	s := store.NewURLStore(*redisFlag)
+	client, err := rpc.DialHTTPPath("tcp", *serverFlag, "/rpc")
+	if err != nil {
+		log.Fatalln("Error connecting to RPC server.", err)
+	}
 
 	var out string
 	switch cmd.cmd {
 	case cmdAdd:
-		if key, err := s.New(cmd.url); err != nil {
+		args := api.NewArgs(cmd.url)
+		reply := new(api.NewReply)
+		if err := client.Call("URL.New", args, reply); err != nil {
 			log.Fatalf("Couldn't add %s\n%s\n", cmd.url, err.Error())
 		} else {
-			out = key
+			out = string(*reply)
 		}
 	case cmdSet:
-		if err := s.Set(cmd.key, cmd.url); err != nil {
+		args := &api.SetArgs{Key: cmd.key, URL: cmd.url}
+		reply := new(api.SetReply)
+		if err := client.Call("URL.Set", args, reply); err != nil {
 			log.Fatalf("Couldn't set %s => %s\n%s\n", cmd.key, cmd.url, err.Error())
 		} else {
 			out = cmd.key
 		}
 	case cmdGet:
-		if url, err := s.Get(cmd.key); err != nil {
+		args := api.GetArgs(cmd.url)
+		reply := new(api.GetReply)
+		if err := client.Call("URL.Get", args, reply); err != nil {
 			log.Fatalf("Couldn't get %s\n%s\n", cmd.key, err.Error())
 		} else {
-			out = url
+			out = string(*reply)
 		}
 	}
 
