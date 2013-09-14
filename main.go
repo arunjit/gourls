@@ -73,5 +73,5 @@ func main() {
 		createJSON()
 	}
 
-	http.ListenAndServe(*addrFlag, nil)
+	log.Fatalln(http.ListenAndServe(*addrFlag, nil))
 }
