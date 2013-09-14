@@ -45,8 +45,6 @@ func createRPC() {
 	svr := rpc.NewServer()
 	svr.RegisterName(serviceName, svc)
 	svr.HandleHTTP(rpcPath, rpcDebugPath)
-	svr.Register(svc)
-	svr.HandleHTTP()
 }
 
 func createJSON() {
