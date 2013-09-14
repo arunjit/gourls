@@ -84,7 +84,7 @@ func main() {
 			out = cmd.key
 		}
 	case cmdGet:
-		args := api.GetArgs(cmd.url)
+		args := api.GetArgs(cmd.key)
 		reply := new(api.GetReply)
 		if err := client.Call("URL.Get", args, reply); err != nil {
 			log.Fatalf("Couldn't get %s\n%s\n", cmd.key, err.Error())
